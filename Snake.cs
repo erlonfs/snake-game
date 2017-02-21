@@ -5,6 +5,7 @@ namespace Snake
 	public class Snake : IElement
 	{
 		public ConsoleColor Cor { get; set; }
+		public Type Type { get { return Type.Snake; } }
 
 		public int DX { get; set; }
 		public int DY { get; set; }
@@ -14,38 +15,43 @@ namespace Snake
 		public int Width { get; set; }
 		public int Height { get; set; }
 
-		public void Update(bool colision)
+		public bool IsDead { get; private set; }
+
+		public void Update(IElement colision)
 		{
-			if (colision)
+			if (colision != null)
 			{
-				DX *= -1;
-				DY *= -1;
-			}
-			else
-			{
-				if (X + Width >= Console.WindowWidth)
+				if (colision.Type == Type.Food)
 				{
-					DX = -1;
+					Width++;
+					return;
 				}
 
-				if (X - Width <= 0)
-				{
-					DX = 1;
-				}
+				IsDead = true;
+				return;
 
-				if (Y - Height <= 0)
-				{
-					DY = 1;
-				}
-
-				if (Y + Height >= Console.WindowHeight)
-				{
-					DY = -1;
-				}
 			}
 
-			X += DX;
-			Y += DY;
+			if (X + Width >= Console.WindowWidth)
+			{
+				IsDead = true;
+			}
+
+			if (X - Width <= 0)
+			{
+				IsDead = true;
+			}
+
+			if (Y - Height <= 0)
+			{
+				IsDead = true;
+			}
+
+			if (Y + Height >= Console.WindowHeight)
+			{
+				IsDead = true;
+			}
+
 
 		}
 
@@ -61,7 +67,7 @@ namespace Snake
 						{
 							Console.SetCursorPosition(x, y);
 							Console.ForegroundColor = Cor;
-							Console.Write("0");
+							Console.Write(".");
 						}
 					}
 				}
