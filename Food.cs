@@ -15,18 +15,18 @@ namespace Snake
 		public int Width { get; set; }
 		public int Height { get; set; }
 
-		public bool IsEated { get; private set; }
+		public OnEat Eated { get; set; }
+		public delegate void OnEat();
 
 		public void Update(IElement colision)
 		{
 			if (colision != null && colision.Type == Type.Snake)
 			{
-				IsEated = true;
+				Eated();
 
 				var rand = new Random();
 				X = rand.Next(0, Console.WindowWidth);
 				Y = rand.Next(0, Console.WindowHeight);
-
 			}
 
 		}
@@ -35,7 +35,7 @@ namespace Snake
 		{
 			Console.SetCursorPosition(X, Y);
 			Console.ForegroundColor = Cor;
-			Console.Write("0");
+			Console.Write("*");
 		}
 
 		public Food()

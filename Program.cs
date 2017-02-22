@@ -15,10 +15,13 @@ namespace Snake
 		private static double _frames { get { return 1000D / (_msNextFrame + _msMainLoop); } }
 		private static double _msNextFrame;
 		private static double _msBase { get { return 16.6; } }
-		private static double _msGameVelocity { get { return 10; } }
+		private static double _msGameVelocity { get; set; }
 		private static double _msMainLoop = 0;
 
-		private static int _mod = 0;
+		private static double _gameScore = 0;
+
+		private static ConsoleKey _key;
+		private static int _mod;
 
 		private static TimeSpan _timeGameUpdate { get; set; }
 		private static TimeSpan _timeMainLoop { get; set; }
@@ -41,6 +44,12 @@ namespace Snake
 
 			while (true)
 			{
+
+				if (Console.KeyAvailable)
+				{
+					_key = Console.ReadKey(true).Key;
+				}
+
 				if (_timeMainLoop <= DateTime.Now.TimeOfDay)
 				{
 					_stWatch.Reset();
@@ -70,18 +79,22 @@ namespace Snake
 					_timesOfMainLoop.Clear();
 				}
 
-
-
 			}
 		}
 
 		static void ShowFrameRate(int frames, double msMainLoop)
 		{
 			Console.Title = $@".:: snake game ::.   {frames.ToString("N0")} fps | 
-							elapsed main loop {msMainLoop.ToString("N0")} milliseconds";
+							elapsed main loop {msMainLoop.ToString("N0")} milliseconds | 
+							SCORE {_gameScore}";
 		}
 
-		static bool Colision(IElement elem1, IElement elem2)
+		static bool ColisionPoint(IElement elem1, IElement elem2)
+		{
+			return elem1.X == elem2.X && elem1.Y == elem2.Y;
+		}
+
+		static bool ColisionArea(IElement elem1, IElement elem2)
 		{
 			int left1 = elem1.X;
 			int left2 = elem2.X;
@@ -104,16 +117,17 @@ namespace Snake
 
 		static void Run()
 		{
-			ConsoleKey key = ConsoleKey.NoName;
-
-			if (Console.KeyAvailable)
-			{
-				key = Console.ReadKey(true).Key;
-			}
+			var snake = _elements.First(x => x.Type == Type.Snake) as Snake;
 
 			if (_timeGameUpdate < DateTime.Now.TimeOfDay)
 			{
-				Console.Clear();
+				if (_mod % snake.Width == 0)
+				{
+					_mod = 0;
+					Console.Clear();
+				}
+
+				_mod++;
 
 				_elements.ForEach(e =>
 				{
@@ -121,70 +135,71 @@ namespace Snake
 					{
 						if (e != x)
 						{
-							if (Colision(e, x))
+							if (ColisionPoint(e, x))
 							{
 								e.Update(x);
-								e.Draw();
-
 								x.Update(e);
-								x.Draw();
 							}
 						}
 					});
-
-
-					if (e.Type == Type.Snake)
-					{
-
-						if (key != ConsoleKey.NoName)
-						{
-							switch (key)
-							{
-								case ConsoleKey.W:
-								case ConsoleKey.UpArrow:
-									e.Y--;
-									break;
-
-								case ConsoleKey.S:
-								case ConsoleKey.DownArrow:
-									e.Y++;
-									break;
-
-								case ConsoleKey.A:
-								case ConsoleKey.LeftArrow:
-									e.X--;
-									break;
-
-								case ConsoleKey.D:
-								case ConsoleKey.RightArrow:
-									e.X++;
-									break;
-							}
-						}
-					}
 
 					e.Update(null);
 					e.Draw();
 
 				});
 
+				if (snake != null && snake.IsDead)
+				{
+					Initialize();
+				}
+
 				_timeGameUpdate = DateTime.Now.AddMilliseconds(_msGameVelocity).TimeOfDay;
 
 			}
+
+			switch (_key)
+			{
+				case ConsoleKey.W:
+				case ConsoleKey.UpArrow:
+					snake.Direction = Direction.Up;
+					break;
+
+				case ConsoleKey.S:
+				case ConsoleKey.DownArrow:
+					snake.Direction = Direction.Down;
+					break;
+
+				case ConsoleKey.A:
+				case ConsoleKey.LeftArrow:
+					snake.Direction = Direction.Left;
+					break;
+
+				case ConsoleKey.D:
+				case ConsoleKey.RightArrow:
+					snake.Direction = Direction.Right;
+					break;
+				default:
+					snake.Direction = Direction.None;
+					break;
+			}
+
 		}
 
 		static void Initialize()
 		{
 			Console.CursorVisible = false;
+			_elements.Clear();
+			_key = ConsoleKey.NoName;
+			_msGameVelocity = 100;
 
 			var rand = new Random();
 			_timeMainLoop = DateTime.Now.TimeOfDay;
 			_msNextFrame = _msBase;
 
 			var snake = new Snake();
-			snake.X = 1;
+			snake.X = 10;
 			snake.Y = 10;
-			snake.Width = 1;
+			snake.Width = 5;
 			snake.Height = 1;
 			snake.Cor = ConsoleColor.DarkGreen;
 
@@ -196,6 +211,11 @@ namespace Snake
 			food.Width = 1;
 			food.Height = 1;
 			food.Cor = ConsoleColor.White;
+			food.Eated = () =>
+			{
+				_msGameVelocity -= 1;
+				_gameScore += 10;
+			};
 
 			_elements.Add(food);
 

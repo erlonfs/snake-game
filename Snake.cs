@@ -12,10 +12,12 @@ namespace Snake
 
 		public int X { get; set; }
 		public int Y { get; set; }
+
 		public int Width { get; set; }
 		public int Height { get; set; }
 
-		public bool IsDead { get; private set; }
+		public bool IsDead { get; private set; } = false;
+		public Direction Direction { get; set; } = Direction.Right;
 
 		public void Update(IElement colision)
 		{
@@ -53,25 +55,58 @@ namespace Snake
 			}
 
 
+			if (Direction == Direction.Down)
+			{
+				Y += 1;
+			}
+
+			if (Direction == Direction.Up)
+			{
+				Y += -1;
+			}
+
+			if (Direction == Direction.Left)
+			{
+				X += -1;
+			}
+
+			if (Direction == Direction.Right)
+			{
+				X += 1;
+			}
+
 		}
 
 		public void Draw()
 		{
-			for (int x = 0; x < Console.WindowWidth; x++)
+			Console.ForegroundColor = Cor;
+
+			var texture = string.Empty;
+
+			if (Direction == Direction.Down)
 			{
-				if (x >= (X - Width) && x <= (X + Width))
-				{
-					for (int y = 0; y < Console.WindowHeight; y++)
-					{
-						if (y >= (Y - Height) && y <= (Y + Height))
-						{
-							Console.SetCursorPosition(x, y);
-							Console.ForegroundColor = Cor;
-							Console.Write(".");
-						}
-					}
-				}
+				texture = "--";
 			}
+
+			if (Direction == Direction.Up)
+			{
+				texture = "--";
+			}
+
+			if (Direction == Direction.Left)
+			{
+				texture = "|||";
+			}
+
+			if (Direction == Direction.Right)
+			{
+				texture = "|||";
+			}
+
+			Console.SetCursorPosition(X, Y);
+			Console.Write(texture);
+
+
 		}
 
 		public Snake()
@@ -81,4 +116,14 @@ namespace Snake
 			Cor = ConsoleColor.White;
 		}
 	}
+
+	public enum Direction
+	{
+		None,
+		Up,
+		Down,
+		Left,
+		Right
+	}
+
 }
