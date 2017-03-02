@@ -35,7 +35,7 @@ namespace Snake
 		{
 			Console.SetCursorPosition(X, Y);
 			Console.ForegroundColor = Cor;
-			Console.Write("*");
+			Console.Write("■");
 		}
 
 		public Food()

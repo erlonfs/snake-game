@@ -85,22 +85,22 @@ namespace Snake
 
 			if (Direction == Direction.Down)
 			{
-				texture = "--";
+				texture = "W";
 			}
 
 			if (Direction == Direction.Up)
 			{
-				texture = "--";
+				texture = "M";
 			}
 
 			if (Direction == Direction.Left)
 			{
-				texture = "|||";
+				texture = "<<";
 			}
 
 			if (Direction == Direction.Right)
 			{
-				texture = "|||";
+				texture = ">>";
 			}
 
 			Console.SetCursorPosition(X, Y);

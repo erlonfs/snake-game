@@ -191,6 +191,7 @@ namespace Snake
 			_elements.Clear();
 			_key = ConsoleKey.NoName;
 			_msGameVelocity = 100;
+			_gameScore = 0;
 
 			var rand = new Random();
 			_timeMainLoop = DateTime.Now.TimeOfDay;
