@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Snake
 {
@@ -44,7 +41,6 @@ namespace Snake
 
 			while (true)
 			{
-
 				if (Console.KeyAvailable)
 				{
 					_key = Console.ReadKey(true).Key;
@@ -55,7 +51,14 @@ namespace Snake
 					_stWatch.Reset();
 					_stWatch.Start();
 
-					Run();
+					try
+					{
+						Run();
+					}
+					catch (Exception)
+					{
+						Initialize();
+					}
 
 					_stWatch.Stop();
 					_msMainLoop = _stWatch.ElapsedMilliseconds;
@@ -77,6 +80,7 @@ namespace Snake
 
 					_countFrames = 0;
 					_timesOfMainLoop.Clear();
+					_timeMainLoop = DateTime.Now.TimeOfDay;
 				}
 
 			}
@@ -85,7 +89,7 @@ namespace Snake
 		static void ShowFrameRate(int frames, double msMainLoop)
 		{
 			Console.Title = $@".:: snake game ::.   {frames.ToString("N0")} fps | 
-							elapsed main loop {msMainLoop.ToString("N0")} milliseconds | 
+							elapsed main loop {msMainLoop.ToString("N1")} milliseconds | 
 							SCORE {_gameScore}";
 		}
 
@@ -148,11 +152,6 @@ namespace Snake
 
 				});
 
-				if (snake != null && snake.IsDead)
-				{
-					Initialize();
-				}
-
 				_timeGameUpdate = DateTime.Now.AddMilliseconds(_msGameVelocity).TimeOfDay;
 
 			}
@@ -178,10 +177,13 @@ namespace Snake
 				case ConsoleKey.RightArrow:
 					snake.Direction = Direction.Right;
 					break;
+				case ConsoleKey.Spacebar:
+					break;
 				default:
 					snake.Direction = Direction.None;
 					break;
 			}
+
 
 		}
 
@@ -190,6 +192,7 @@ namespace Snake
 			Console.CursorVisible = false;
 			_elements.Clear();
 			_key = ConsoleKey.NoName;
+
 			_msGameVelocity = 100;
 			_gameScore = 0;
 
@@ -203,6 +206,20 @@ namespace Snake
 			snake.Width = 5;
 			snake.Height = 1;
 			snake.Cor = ConsoleColor.DarkGreen;
+			snake.Dead = () =>
+			{
+				Console.Clear();
+				Console.SetCursorPosition((Console.WindowWidth / 2) - 5, Console.WindowHeight / 2);
+				Console.Write("Game Over");
+				Console.ReadKey();
+
+				Console.Clear();
+				Console.SetCursorPosition((Console.WindowWidth / 2) - 5, Console.WindowHeight / 2);
+				Console.Write("Try Again?");
+				Console.ReadKey();
+
+				Initialize();
+			};
 
 			_elements.Add(snake);
 
@@ -211,11 +228,11 @@ namespace Snake
 			food.Y = rand.Next(0, Console.WindowHeight);
 			food.Width = 1;
 			food.Height = 1;
-			food.Cor = ConsoleColor.White;
+			food.Cor = ConsoleColor.Gray;
 			food.Eated = () =>
 			{
-				_msGameVelocity -= 1;
-				_gameScore += 10;
+				_msGameVelocity -= _msGameVelocity * 0.1; //Acelara em 10% o game loop
+				_gameScore += 50;
 			};
 
 			_elements.Add(food);

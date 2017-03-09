@@ -25,8 +25,8 @@ namespace Snake
 				Eated();
 
 				var rand = new Random();
-				X = rand.Next(0, Console.WindowWidth);
-				Y = rand.Next(0, Console.WindowHeight);
+				X = rand.Next(0, Console.WindowWidth - 2);
+				Y = rand.Next(0, Console.WindowHeight - 2);
 			}
 
 		}
