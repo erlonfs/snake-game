@@ -16,7 +16,9 @@ namespace Snake
 		public int Width { get; set; }
 		public int Height { get; set; }
 
-		public bool IsDead { get; private set; } = false;
+		public OnDead Dead { get; set; }
+		public delegate void OnDead();
+
 		public Direction Direction { get; set; } = Direction.Right;
 
 		public void Update(IElement colision)
@@ -29,50 +31,35 @@ namespace Snake
 					return;
 				}
 
-				IsDead = true;
+				Dead();
 				return;
 
 			}
 
-			if (X + Width >= Console.WindowWidth)
+			if (X >= Console.WindowWidth || X <= 0 || Y <= 0 || Y >= Console.WindowHeight)
 			{
-				IsDead = true;
+				Dead();
+				return;
 			}
-
-			if (X - Width <= 0)
-			{
-				IsDead = true;
-			}
-
-			if (Y - Height <= 0)
-			{
-				IsDead = true;
-			}
-
-			if (Y + Height >= Console.WindowHeight)
-			{
-				IsDead = true;
-			}
-
 
 			if (Direction == Direction.Down)
 			{
-				Y += 1;
+				Y += DY;
 			}
 
 			if (Direction == Direction.Up)
 			{
-				Y += -1;
+				Y -= DY;
 			}
 
 			if (Direction == Direction.Left)
 			{
-				X += -1;
+				X -= DX;
 			}
 
 			if (Direction == Direction.Right)
 			{
-				X += 1;
+				X += DX;
 			}
 
 		}
@@ -105,7 +92,6 @@ namespace Snake
 
 			Console.SetCursorPosition(X, Y);
 			Console.Write(texture);
-
 
 		}
 
