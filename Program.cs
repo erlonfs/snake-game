@@ -11,11 +11,13 @@ namespace Snake
 
 		private static double _frames { get { return 1000D / (_msNextFrame + _msMainLoop); } }
 		private static double _msNextFrame;
-		private static double _msBase { get { return 16.6; } }
+		private static double _msBase { get; set; }
 		private static double _msGameVelocity { get; set; }
 		private static double _msMainLoop = 0;
 
 		private static double _gameScore = 0;
+		private static int _fps = 10;
+		private static int _fpsTolerancia = 2;
 
 		private static ConsoleKey _key;
 		private static int _mod;
@@ -73,7 +75,16 @@ namespace Snake
 
 				if (_timeFrameRate <= DateTime.Now.TimeOfDay)
 				{
-
+					if(_countFrames + _fpsTolerancia < _fps)
+					{
+						_msBase -= 0.1;
+					}
+					
+					if(_countFrames - _fpsTolerancia > _fps)
+					{
+						_msBase += 0.1;
+					}
+			
 					ShowFrameRate(_countFrames, _timesOfMainLoop.Average());
 
 					_timeFrameRate = DateTime.Now.AddSeconds(1).TimeOfDay;
@@ -198,6 +209,7 @@ namespace Snake
 
 			var rand = new Random();
 			_timeMainLoop = DateTime.Now.TimeOfDay;
+			_msBase = 16.6;
 			_msNextFrame = _msBase;
 
 			var snake = new Snake();
